@@ -73,7 +73,7 @@ class CaptionRequest(BaseModel):
     business_name: str
     business_description: str
     raw_text: str
-    media_path: str
+    media_path: Optional[str] = None
     tone: Optional[str] = "professional"  # professional, casual, humorous
 
 

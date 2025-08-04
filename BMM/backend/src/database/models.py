@@ -15,7 +15,7 @@ from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
 
-Database_url =("sqlite:///datbase.db")
+Database_url = ("sqlite:///database.db")
 engine = create_engine(Database_url, echo=True)
 
 
@@ -63,12 +63,12 @@ class Post(Base):
     __tablename__ = "posts"
 
     id = Column(Integer, primary_key=True, index=True)
-    owner_id = Column(String, nullable=False, unique=True)
+    owner_id = Column(String, nullable=False)
     content = Column(String(280), nullable=False)
     scheduled_time = Column(DateTime)
     platform = Column(String(20), nullable=False)
     timestamp = Column(DateTime, default=datetime.now(timezone.utc))
-    status = Column(String(20), default="pending, scheduled, posted")
+    status = Column(String(20), default="pending")
     posted = Column(Boolean, default=False)
 #    owner_id = Column(Integer, ForeignKey("users.id"))
 
@@ -102,4 +102,4 @@ def get_db():
     try:
         yield db
     finally:
-        db.close
+        db.close()

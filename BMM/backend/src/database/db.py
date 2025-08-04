@@ -8,7 +8,12 @@ from typing import Optional
 
 
 def get_user_contents(db: Session, user_id: str):
-    return db.query(models.Content).filter(models.Content.user_id == user_id).all()
+    try:
+        contents = db.query(models.Content).filter(models.Content.user_id == user_id).all()
+        return contents
+    except Exception as e:
+        print(f"Error fetching user contents: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to fetch contents")
 
 
 def create_content(
@@ -19,23 +24,28 @@ def create_content(
     created_at: datetime,
     is_curated: bool = False,
 ):
+    try:
+        # Validate (optional)
+        if not raw_text:
+            raise HTTPException(status_code=400, detail="raw_text cannot be empty")
 
-    db_content = models.Content(
-        user_id=user_id,
-        generated_content="",  # Will be updated later
-        raw_text=raw_text,
-        media_path=media_path,
-        created_at=created_at,
-        is_curated=is_curated,
-    )
-    # Validate (optional)
-    if not raw_text:
-        raise HTTPException(status_code=400, detail="raw_text cannot be empty")
+        db_content = models.Content(
+            user_id=user_id,
+            generated_content="",  # Will be updated later
+            raw_text=raw_text,
+            media_path=media_path,
+            created_at=created_at,
+            is_curated=is_curated,
+        )
 
-    db.add(db_content)
-    db.commit()
-    db.refresh(db_content)
-    return db_content
+        db.add(db_content)
+        db.commit()
+        db.refresh(db_content)
+        return db_content
+    except Exception as e:
+        db.rollback()
+        print(f"Error creating content: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to create content")
 
 
 def create_business_profile(
@@ -48,32 +58,41 @@ def create_business_profile(
     tone: Optional[str] = "professional"
 
 ):
+    try:
+        if not business_name:
+            raise HTTPException(status_code=400, detail="business_name cannot be empty")
+        if not description:
+            raise HTTPException(status_code=400, detail="description cannot be empty")
 
-    db_business_profile = models.BusinessProfile(
-        user_id=user_id,
-        business_name=business_name,
-        description=description,
-        website=website,
-        created_at=created_at,
-        tone=tone,
+        db_business_profile = models.BusinessProfile(
+            user_id=user_id,
+            business_name=business_name,
+            description=description,
+            website=website,
+            created_at=created_at,
+            tone=tone,
+        )
 
+        db.add(db_business_profile)
+        db.commit()
+        db.refresh(db_business_profile)
+        return db_business_profile
+    except Exception as e:
+        db.rollback()
+        print(f"Error creating business profile: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to create business profile")
 
-    )
-    if not business_name:
-        raise HTTPException(status_code=400, detail="business_name cannot be empty")
-    if not description:
-        raise HTTPException(status_code=400, detail="description cannot be empty")
-
-    db.add(db_business_profile)
-    db.commit()
-    db.refresh(db_business_profile)
-    return db_business_profile
 
 
 def get_business_profile(db: Session, user_id: str):
-    return (db.query(models.BusinessProfile)
-            .filter(models.BusinessProfile.user_id == user_id)
-            .first())
+    try:
+        profile = (db.query(models.BusinessProfile)
+                .filter(models.BusinessProfile.user_id == user_id)
+                .first())
+        return profile
+    except Exception as e:
+        print(f"Error fetching business profile: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to fetch business profile")
 
 
 
