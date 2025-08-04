@@ -1,0 +1,120 @@
+business_marketing_ai_backend/
+├── app/
+│   ├── __init__.py
+│   |── auths.py
+|   |── databse.py
+|   |── exception.py
+|   |── main.py.py           # Entry point
+│   ├── models.py         # Database models (optional if using ODM/ORM)
+│   ├── schemas.py        # Pydantic models for request/response validation
+│   ├── api.py           # Functions to interact with the database
+│   ├── routes/           # API route handlers
+│   │   ├── __init__.py
+│   │   ├── auth_routes.py
+│   │   ├── post_routes.py  │   
+│   │   │── business.py     
+│   │   │── content.py
+│   │	│── users.py
+│   │ 
+│   │
+│   ├── services/         # External services: AI, social media APIs
+│   │   ├── __init__.py
+│   │   ├── caption_curator.py
+│   │   ├── scheduler.py
+│   │   ├── X_content_poster.py
+│   │   │
+├── requirements.txt
+├── .env                  # Environment variables
+└── README.md
+
+
+this use case is a basic test for a business marketing model that automates user posts. 
+it is aimed at providing automating scheduled posts by users either for marketing or just for basic user posts,
+ it is harmless and has no intention of violating X terms and conditions.
+https://tonytest.tafo.name.ng
+http://127.0.0.1:8000
+
+client_ID= U0hLa3JhYkQ4UDE5U1VMOVQ3ZnQ6MTpjaQ
+client_secret= tiBUahO2CpVuqeSQbJmGv48Gkz_LxBZDDnPv_T7V5TXCdVpACq
+
+API_key= 135dV70ylLCWwfG52ACRIH5Cu
+API_secret= HE6flvpknOLMwJl7yCBt0XKzKkUfA8WX1rplTDsnb5f2yxS8Ja
+
+Access_Token= 1944363250222579712-ObfAiy8JurZtBPPO86mK2B24ePkC4T
+Access_Token_Secrect= S6NUtKQEXCYzhPnSWQvTCzlOqfJudx9YEbtdsyKCTawA0f
+
+Frontend
+
+
+
+src/
+├── components/
+│   ├── BusinessProfileForm.jsx
+│   ├── ContentCreator.jsx
+│   ├── ContentHistory.jsx
+│   ├── Dashboard.jsx
+│   ├── Navbar.jsx
+│   ├── SchedulePost.jsx
+│   └── SocialPlatformSelector.jsx
+├── pages/
+│   ├── DashboardPage.jsx
+│   ├── HomePage.jsx
+│   └── LoginPage.jsx
+├── services/
+│   ├── api.js
+│   └── auth.js
+├── App.js
+└── index.js
+
+<link rel="icon" type="image/svg+xml" href="/vite.svg" />
+backend uvicorn command= uvicorn src.app:app --reload 
+
+frontend = npm run dev
+		npm install
+axios help in linking frontend to backend but its not neccessary for this project
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+dependencies[ pip install: cffi,clerk-backend-api]
+
+			 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
