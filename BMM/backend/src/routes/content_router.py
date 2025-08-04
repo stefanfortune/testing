@@ -22,12 +22,26 @@ async def my_business_profile(request: Request, db: Session = Depends(get_db)):
     try:
         user_details = authenticate_and_get_user_details(request)
         user_id = user_details.get("user_id")
+        
+        if not user_id:
+            raise HTTPException(status_code=401, detail="User ID not found")
+            
         business_profile = get_business_profile(db, user_id)
         if not business_profile:
-            raise HTTPException(status_code=400, detail="business profile does not exist")
-        return business_profile
+            raise HTTPException(status_code=404, detail="Business profile does not exist")
+        
+        return {
+            "id": business_profile.id,
+            "user_id": business_profile.user_id,
+            "business_name": business_profile.business_name,
+            "description": business_profile.description,
+            "website": business_profile.website,
+            "tone": business_profile.tone,
+            "created_at": business_profile.created_at
+        }
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        print(f"Error in business profile endpoint: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.post("/create-business-profile")
@@ -35,6 +49,15 @@ async def your_business_profile(request:BusinessProfile, request_obj: Request, d
     try:
         user_details = authenticate_and_get_user_details(request_obj)
         user_id = user_details.get("user_id")
+        
+        if not user_id:
+            raise HTTPException(status_code=401, detail="User ID not found")
+            
+        # Check if profile already exists
+        existing_profile = get_business_profile(db, user_id)
+        if existing_profile:
+            raise HTTPException(status_code=400, detail="Business profile already exists")
+            
         now = datetime.now()
         new_business_profile = create_business_profile(db=db,
                                                        user_id=user_id,
@@ -45,48 +68,74 @@ async def your_business_profile(request:BusinessProfile, request_obj: Request, d
                                                        tone=request.tone
                                                        )
 
-        db.commit()
-        return new_business_profile
+        return {
+            "id": new_business_profile.id,
+            "user_id": new_business_profile.user_id,
+            "business_name": new_business_profile.business_name,
+            "description": new_business_profile.description,
+            "website": new_business_profile.website,
+            "tone": new_business_profile.tone,
+            "created_at": new_business_profile.created_at
+        }
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        print(f"Error creating business profile: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.post("/Create content")
+@router.post("/create-content")
 async def generate_content(request: CaptionRequest, request_obj: Request, db: Session = Depends(get_db)):
     try:
         user_details = authenticate_and_get_user_details(request_obj)
         user_id = user_details.get("user_id")
+        
+        if not user_id:
+            raise HTTPException(status_code=401, detail="User ID not found")
+            
         business_profile = get_business_profile(db, user_id)
         if not business_profile:
-            business_profile = create_business_profile(db, user_id)
-            return business_profile
+            raise HTTPException(status_code=404, detail="Business profile not found. Please create one first.")
+            
         generate_caption = curate_caption(
-            business_name=request.business_name,
-            business_description=request.business_description,
+            business_name=business_profile.business_name,
+            business_description=business_profile.description,
             raw_text=request.raw_text,                                           
-            tone=request.tone,
+            tone=business_profile.tone,
             )
         media_path = request.media_path
-        generated_content = generate_caption, media_path
+        generated_content = generate_caption
         now = datetime.now()
         new_content = create_content(db=db, user_id=user_id,
                                      raw_text=request.raw_text,
                                      media_path=media_path,
-                                     generated_content=generated_content,
                                      created_at=now,
                                      is_curated=True)
         db.commit()
-        return new_content.generated_content
+        return {
+            "id": new_content.id,
+            "generated_content": generated_content,
+            "raw_text": new_content.raw_text,
+            "media_path": new_content.media_path,
+            "created_at": new_content.created_at
+        }
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        print(f"Error generating content: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/Content history")
+@router.get("/content-history")
 async def content_history(request: Request, db: Session = Depends(get_db)):
-    user_details = authenticate_and_get_user_details(request)
-    user_id = user_details.get("user_id")
-    contents = get_user_contents(db, user_id)
-    return {"contents": contents}
+    try:
+        user_details = authenticate_and_get_user_details(request)
+        user_id = user_details.get("user_id")
+        
+        if not user_id:
+            raise HTTPException(status_code=401, detail="User ID not found")
+            
+        contents = get_user_contents(db, user_id)
+        return {"contents": contents}
+    except Exception as e:
+        print(f"Error fetching content history: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
     
 

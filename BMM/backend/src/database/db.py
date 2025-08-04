@@ -15,13 +15,14 @@ def create_content(
     db: Session,
     user_id: str,
     raw_text: str,
-    media_path: str,
+    media_path: str = None,
     created_at: datetime,
-    is_curated: bool,
+    is_curated: bool = False,
 ):
 
     db_content = models.Content(
         user_id=user_id,
+        generated_content="",  # Will be updated later
         raw_text=raw_text,
         media_path=media_path,
         created_at=created_at,
@@ -71,7 +72,8 @@ def create_business_profile(
 
 def get_business_profile(db: Session, user_id: str):
     return (db.query(models.BusinessProfile)
-            .filter(models.BusinessProfile.user_id == user_id))
+            .filter(models.BusinessProfile.user_id == user_id)
+            .first())
 
 
 
